@@ -1,0 +1,16 @@
+.
+├── bin
+│   └── cli.mjs
+├── jest.config.js
+├── LICENSE
+├── package.json
+├── package-lock.json
+├── README.md
+├── src
+│   ├── core
+│   │   └── crypto.mjs
+│   └── index.mjs
+└── test
+    └── crypto.test.js
+
+5 directories, 9 files

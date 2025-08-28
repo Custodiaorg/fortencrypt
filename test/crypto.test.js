@@ -1,19 +1,32 @@
 import { encrypt, decrypt } from "../src/core/crypto.mjs";
 
-describe("AES-256-GCM", () => {
-  test("round-trip string", () => {
-    const text = "hello world 🌍";
-    const encrypted = encrypt(text);
-    const decrypted = decrypt(encrypted).toString();
-
-    expect(decrypted).toBe(text);
+describe("AES-256-GCM Object Payload", () => {
+  test("encrypt & decrypt string correctly", () => {
+    const message = "hello world";
+    const encrypted = encrypt(message);
+    const decrypted = decrypt(encrypted);
+    expect(decrypted.toString()).toBe(message);
   });
 
-  test("round-trip buffer", () => {
-    const buf = Buffer.from("secret-buffer-data");
-    const encrypted = encrypt(buf);
+  test("encrypt & decrypt buffer correctly", () => {
+    const message = Buffer.from("buffer test");
+    const encrypted = encrypt(message);
     const decrypted = decrypt(encrypted);
+    expect(decrypted.equals(message)).toBe(true);
+  });
 
-    expect(decrypted.equals(buf)).toBe(true);
+  test("rejects invalid input type", () => {
+    expect(() => encrypt(123)).toThrow("Input must be a string or Buffer");
+  });
+
+  test("throws error on corrupted payload", () => {
+    const corrupted = {
+      iv: "00".repeat(12),
+      tag: "00".repeat(16),
+      ciphertext: "abcd",
+    };
+    expect(() => decrypt(corrupted)).toThrow(
+      "Decryption failed: invalid or corrupted data"
+    );
   });
 });
