@@ -36,7 +36,7 @@ jobs:
     - name: Test CLI commands
       run: |
         # Define CLI command path
-        FORTENCRYPT="node dist/bin/cli.js"
+        FORTENCRYPT="node dist/src/bin/cli.js"
         
         # Test 1: Generate key
         echo "Testing key generation..."
