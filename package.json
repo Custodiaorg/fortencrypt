@@ -2,6 +2,16 @@
   "name": "fortencrypt",
   "version": "0.0.1",
   "description": "Node.js encryption made effortless — configure once, encrypt everywhere.",
+  "keywords": [
+    "encryption",
+    "decryption",
+    "crypto",
+    "aes",
+    "aes-256-gcm",
+    "security",
+    "fortencrypt",
+    "custodiaorg"
+  ],
   "homepage": "https://github.com/Custodiaorg/fortencrypt#readme",
   "bugs": {
     "url": "https://github.com/Custodiaorg/fortencrypt/issues"
@@ -11,17 +21,38 @@
     "url": "git+https://github.com/Custodiaorg/fortencrypt.git"
   },
   "license": "MIT",
-  "author": "custodiaorg",
+  "author": "custodiaorg <support@custodia.org>",
   "type": "module",
-  "main": "bin/index.mjs",
+  "main": "src/index.mjs",
+  "exports": {
+    ".": "./src/index.mjs"
+  },
+  "bin": {
+    "fortencrypt": "./bin/cli.mjs"
+  },
+  "files": [
+    "src",
+    "bin",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "lint": "eslint . --ext .js,.mjs",
+    "prepare": "npm run test"
   },
   "dependencies": {
-    "dotenv": "^17.2.1"
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
-    "@jest/globals": "^30.1.1",
-    "jest": "^30.1.1"
+    "@jest/globals": "^29.7.0",
+    "jest": "^29.7.0",
+    "eslint": "^8.57.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
