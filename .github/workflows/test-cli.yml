@@ -28,8 +28,8 @@ jobs:
 
       - name: Run Deep Test Harness
         run: |
-          chmod +x /script/cli-test.sh
-          /script/cli-test.sh
+          chmod +x ./script/cli-test.sh
+          ./script/cli-test.sh
         env:
           # Bisa override config di script:
           DEBUG: "0"
