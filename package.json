@@ -33,7 +33,7 @@
     }
   },
   "bin": {
-    "fortencrypt": "./dist/bin/cli.js"
+    "fortencrypt": "./dist/src/bin/cli.js"
   },
   "files": [
     "dist",
