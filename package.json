@@ -1,14 +1,15 @@
 {
   "name": "fortencrypt",
-  "version": "0.1.3",
-  "description": "Node.js encryption made effortless — configure once, encrypt everywhere.",
+  "version": "1.0.0",
+  "description": "Node.js encryption library made effortless — configure once, encrypt everywhere. TypeScript-ready, CLI-ready, secure AES-256-GCM and digital signature support.",
   "keywords": [
     "encryption",
     "decryption",
     "crypto",
     "aes",
     "aes-256-gcm",
-    "security",
+    "digital-signature",
+    "typescript",
     "fortencrypt",
     "custodiaorg"
   ],
@@ -23,31 +24,58 @@
   "license": "MIT",
   "author": "custodiaorg <support@custodia.org>",
   "type": "module",
-  "main": "src/index.mjs",
+  "main": "dist/src/core/index.js",
+  "types": "dist/src/core/index.d.ts",
   "exports": {
-    ".": "./src/index.mjs"
+    ".": {
+      "types": "./dist/src/core/index.d.ts",
+      "import": "./dist/src/core/index.js"
+    }
   },
   "bin": {
-    "fortencrypt": "./bin/cli.mjs"
+    "fortencrypt": "./dist/bin/cli.js"
   },
   "files": [
-    "src",
-    "bin",
+    "dist",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "docs"
   ],
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "lint": "eslint . --ext .js,.mjs",
-    "prepare": "npm run test"
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run build",
+    "lint": "eslint src bin --ext .ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "cli": "node dist/src/bin/cli.js"
   },
   "dependencies": {
-    "dotenv": "^16.4.5"
+    "chalk": "^5.6.0",
+    "cli-progress": "^3.12.0",
+    "commander": "^14.0.0",
+    "dotenv": "^16.4.5",
+    "figlet": "^1.8.2",
+    "inquirer": "^12.9.4",
+    "js-yaml": "^4.1.0",
+    "ora": "^8.2.0",
+    "toml": "^3.0.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
+    "@types/cli-progress": "^3.11.6",
+    "@types/figlet": "^1.7.0",
+    "@types/inquirer": "^9.0.9",
+    "@types/jest": "^29.5.14",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.17.13",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.0",
     "jest": "^29.7.0",
-    "eslint": "^8.57.0"
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.6.3"
   },
   "engines": {
     "node": ">=18"
