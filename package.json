@@ -1,6 +1,6 @@
 {
   "name": "fortencrypt",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Node.js encryption library made effortless — configure once, encrypt everywhere. TypeScript-ready, CLI-ready, secure AES-256-GCM and digital signature support.",
   "keywords": [
     "encryption",
