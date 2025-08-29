@@ -35,9 +35,12 @@ jobs:
 
     - name: Test CLI commands
       run: |
+        # Define CLI command path
+        FORTENCRYPT="node dist/bin/cli.js"
+        
         # Test 1: Generate key
         echo "Testing key generation..."
-        npx fortencrypt generate-key -o test.key
+        $FORTENCRYPT generate-key -o test.key
         if [ ! -f "test.key" ]; then
           echo "Key generation failed"
           exit 1
@@ -46,7 +49,7 @@ jobs:
         # Test 2: Encrypt text
         echo "Testing text encryption..."
         KEY=$(cat test.key)
-        ENCRYPTED_TEXT=$(npx fortencrypt encrypt -t "Hello World" -k "$KEY")
+        ENCRYPTED_TEXT=$($FORTENCRYPT encrypt -t "Hello World" -k "$KEY")
         if [ -z "$ENCRYPTED_TEXT" ]; then
           echo "Text encryption failed"
           exit 1
@@ -54,7 +57,7 @@ jobs:
 
         # Test 3: Decrypt text
         echo "Testing text decryption..."
-        DECRYPTED_TEXT=$(npx fortencrypt decrypt -t "$ENCRYPTED_TEXT" -k "$KEY")
+        DECRYPTED_TEXT=$($FORTENCRYPT decrypt -t "$ENCRYPTED_TEXT" -k "$KEY")
         if [ "$DECRYPTED_TEXT" != "Hello World" ]; then
           echo "Text decryption failed"
           exit 1
@@ -69,7 +72,7 @@ jobs:
 
         # Test 5: Encrypt file
         echo "Testing file encryption..."
-        npx fortencrypt encrypt -i test.txt -o test.enc -k "$KEY"
+        $FORTENCRYPT encrypt -i test.txt -o test.enc -k "$KEY"
         if [ ! -f "test.enc" ]; then
           echo "File encryption failed"
           exit 1
@@ -77,7 +80,7 @@ jobs:
 
         # Test 6: Decrypt file
         echo "Testing file decryption..."
-        npx fortencrypt decrypt -i test.enc -o test_decrypted.txt -k "$KEY"
+        $FORTENCRYPT decrypt -i test.enc -o test_decrypted.txt -k "$KEY"
         if [ ! -f "test_decrypted.txt" ] || [ "$(cat test_decrypted.txt)" != "Test file content" ]; then
           echo "File decryption failed"
           exit 1
@@ -85,7 +88,7 @@ jobs:
 
         # Test 7: Recursive directory encryption
         echo "Testing recursive directory encryption..."
-        npx fortencrypt encrypt -i test_dir -o test_dir_encrypted -k "$KEY" -r
+        $FORTENCRYPT encrypt -i test_dir -o test_dir_encrypted -k "$KEY" -r
         if [ ! -d "test_dir_encrypted" ] || [ ! -f "test_dir_encrypted/file1.txt.enc" ] || [ ! -f "test_dir_encrypted/file2.txt.enc" ]; then
           echo "Recursive directory encryption failed"
           exit 1
@@ -93,7 +96,7 @@ jobs:
 
         # Test 8: Recursive directory decryption
         echo "Testing recursive directory decryption..."
-        npx fortencrypt decrypt -i test_dir_encrypted -o test_dir_decrypted -k "$KEY" -r
+        $FORTENCRYPT decrypt -i test_dir_encrypted -o test_dir_decrypted -k "$KEY" -r
         if [ ! -d "test_dir_decrypted" ] || [ ! -f "test_dir_decrypted/file1.txt" ] || [ ! -f "test_dir_decrypted/file2.txt" ]; then
           echo "Recursive directory decryption failed"
           exit 1
@@ -102,8 +105,8 @@ jobs:
         # Test 9: Test with environment variable key
         echo "Testing with environment variable key..."
         export MASTER_KEY="$KEY"
-        npx fortencrypt encrypt -t "Env test" -o env_test.enc
-        npx fortencrypt decrypt -i env_test.enc -o env_test.txt
+        $FORTENCRYPT encrypt -t "Env test" -o env_test.enc
+        $FORTENCRYPT decrypt -i env_test.enc -o env_test.txt
         if [ "$(cat env_test.txt)" != "Env test" ]; then
           echo "Environment variable key test failed"
           exit 1
@@ -111,8 +114,8 @@ jobs:
 
         # Test 10: Test different algorithm
         echo "Testing different algorithm..."
-        npx fortencrypt encrypt -t "Algorithm test" -k "$KEY" -a chacha20-poly1305 -o algo_test.enc
-        npx fortencrypt decrypt -i algo_test.enc -k "$KEY" -o algo_test.txt
+        $FORTENCRYPT encrypt -t "Algorithm test" -k "$KEY" -a chacha20-poly1305 -o algo_test.enc
+        $FORTENCRYPT decrypt -i algo_test.enc -k "$KEY" -o algo_test.txt
         if [ "$(cat algo_test.txt)" != "Algorithm test" ]; then
           echo "Algorithm test failed"
           exit 1
@@ -120,8 +123,8 @@ jobs:
 
         # Test 11: Test compression
         echo "Testing compression..."
-        npx fortencrypt encrypt -t "Compression test" -k "$KEY" -c -o comp_test.enc
-        npx fortencrypt decrypt -i comp_test.enc -k "$KEY" -o comp_test.txt
+        $FORTENCRYPT encrypt -t "Compression test" -k "$KEY" -c -o comp_test.enc
+        $FORTENCRYPT decrypt -i comp_test.enc -k "$KEY" -o comp_test.txt
         if [ "$(cat comp_test.txt)" != "Compression test" ]; then
           echo "Compression test failed"
           exit 1
@@ -129,8 +132,8 @@ jobs:
 
         # Test 12: Test AAD
         echo "Testing AAD..."
-        npx fortencrypt encrypt -t "AAD test" -k "$KEY" --aad "auth-data" -o aad_test.enc
-        npx fortencrypt decrypt -i aad_test.enc -k "$KEY" --aad "auth-data" -o aad_test.txt
+        $FORTENCRYPT encrypt -t "AAD test" -k "$KEY" --aad "auth-data" -o aad_test.enc
+        $FORTENCRYPT decrypt -i aad_test.enc -k "$KEY" --aad "auth-data" -o aad_test.txt
         if [ "$(cat aad_test.txt)" != "AAD test" ]; then
           echo "AAD test failed"
           exit 1
@@ -138,7 +141,7 @@ jobs:
 
         # Test 13: Test wrong AAD (should fail)
         echo "Testing wrong AAD (should fail)..."
-        if npx fortencrypt decrypt -i aad_test.enc -k "$KEY" --aad "wrong-data" -o aad_test_fail.txt 2>/dev/null; then
+        if $FORTENCRYPT decrypt -i aad_test.enc -k "$KEY" --aad "wrong-data" -o aad_test_fail.txt 2>/dev/null; then
           echo "Wrong AAD test should have failed but didn't"
           exit 1
         fi
