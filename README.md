@@ -1,152 +1,255 @@
-# fortencrypt
+# FortEncrypt
 
-Node.js encryption made effortless  configure once, encrypt everywhere.  
-A lightweight AES-256-GCM utility for authenticated encryption and decryption.  
+FortEncrypt is a comprehensive encryption library and CLI tool for Node.js that provides robust cryptographic operations with an intuitive interface. It supports multiple encryption algorithms, compression, and additional authenticated data (AAD) for enhanced security.
 
----
+## Features
 
-##  Features
--  AES-256-GCM authenticated encryption
--  Works with both strings and Buffers
--  Easy to use API (`encrypt`, `decrypt`)
--  CLI support (`npx fortencrypt`)
--  Configurable master key via environment variable
--  Built-in Jest test suite
+- Multiple encryption algorithms: AES-256-GCM and ChaCha20-Poly1305
+- Configurable encryption settings (algorithm, encoding, compression)
+- Additional Authenticated Data (AAD) support
+- File and directory encryption/decryption
+- Key generation and management
+- Interactive command-line interface
+- Progress indicators for large operations
+- Comprehensive error handling
 
----
+## Installation
 
-##  Installation
+Install the package globally for CLI usage:
+
+```bash
+npm install -g fortencrypt
+```
+
+Or install locally as a dependency:
 
 ```bash
 npm install fortencrypt
 ```
 
-or with yarn:
+## Quick Start
+
+### Generate an Encryption Key
 
 ```bash
-yarn add fortencrypt
+fortencrypt generate-key -o master.key
 ```
 
----
+### Encrypt a File
 
-##  Setup
+```bash
+fortencrypt encrypt -i secret.txt -o secret.enc -k master.key
+```
 
-Before using, set a master key via environment variable.
-Create a `.env` file in your project root:
+### Decrypt a File
+
+```bash
+fortencrypt decrypt -i secret.enc -o secret.txt -k master.key
+```
+
+## CLI Usage
+
+### Generate Key Command
+
+```bash
+fortencrypt generate-key [options]
+```
+
+Options:
+- `-o, --output <file>`: Output file for the key (default: master.key)
+- `-l, --length <length>`: Key length in bytes (default: 32)
+- `-f, --force`: Overwrite existing key file
+
+### Encrypt Command
+
+```bash
+fortencrypt encrypt [input] [options]
+```
+
+Options:
+- `-i, --input <file>`: Input file to encrypt
+- `-t, --text <text>`: Text to encrypt
+- `-o, --output <file>`: Output file for encrypted data
+- `-k, --key <key>`: Encryption key (hex, file path, or env:VAR_NAME)
+- `-a, --algorithm <algorithm>`: Encryption algorithm (default: aes-256-gcm)
+- `-e, --encoding <encoding>`: Output encoding (default: hex)
+- `-c, --compress`: Enable compression
+- `--aad <data>`: Additional authenticated data
+- `--stringify`: Output as JSON string
+- `-r, --recursive`: Encrypt directory recursively
+
+### Decrypt Command
+
+```bash
+fortencrypt decrypt [input] [options]
+```
+
+Options:
+- `-i, --input <file>`: Input file to decrypt
+- `-t, --text <text>`: Text to decrypt
+- `-o, --output <file>`: Output file for decrypted data
+- `-k, --key <key>`: Decryption key (hex, file path, or env:VAR_NAME)
+- `--aad <data>`: Additional authenticated data
+- `--buffer`: Return result as buffer
+- `-r, --recursive`: Decrypt directory recursively
+
+### Interactive Mode
+
+```bash
+fortencrypt interactive
+```
+
+Launches an interactive wizard for encryption and decryption operations.
+
+## Programmatic API
+
+### Basic Usage
+
+```javascript
+import CryptoLib from 'fortencrypt';
+
+// Initialize with environment key
+const crypto = new CryptoLib();
+crypto.initialize();
+
+// Encrypt data
+const encrypted = await crypto.encrypt('Sensitive data');
+console.log(encrypted);
+
+// Decrypt data
+const decrypted = await crypto.decrypt(encrypted);
+console.log(decrypted); // 'Sensitive data'
+```
+
+### Custom Configuration
+
+```javascript
+import CryptoLib from 'fortencrypt';
+
+const crypto = new CryptoLib({
+  algorithm: 'chacha20-poly1305',
+  outputEncoding: 'base64',
+  compression: true,
+});
+
+// Initialize with custom key
+crypto.initialize('your-32-byte-hex-key-here');
+
+const data = { message: 'Hello, World!', number: 42 };
+
+const encrypted = await crypto.encrypt(data);
+const decrypted = await crypto.decrypt(encrypted);
+
+console.log(decrypted); // { message: 'Hello, World!', number: 42 }
+```
+
+### Using AAD (Additional Authenticated Data)
+
+```javascript
+const crypto = new CryptoLib();
+crypto.initialize();
+
+const aad = 'authenticated-data';
+
+const encrypted = await crypto.encrypt('secret message', { aad });
+const decrypted = await crypto.decrypt(encrypted, { aad });
+
+console.log(decrypted); // 'secret message'
+```
+
+### Key Management
+
+```javascript
+import { generateAndSaveKey, CryptoLib } from 'fortencrypt';
+
+// Generate and save a key
+const key = await generateAndSaveKey('master.key', 32);
+console.log(key.toString('hex'));
+
+// Derive a key from a password
+const salt = CryptoLib.generateKey(16);
+const derivedKey = CryptoLib.deriveKey('my-password', salt, 100000, 32);
+```
+
+## Environment Configuration
+
+Set the master key as an environment variable for automatic initialization:
+
+```bash
+export MASTER_KEY=your_32_byte_hex_master_key_here
+```
+
+Or create a `.env` file in your project root:
 
 ```env
-MASTER_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+MASTER_KEY=your_32_byte_hex_master_key_here
 ```
 
-> `MASTER_KEY` must be a **64-character hex string (32 bytes)**.
+## Examples
 
----
-
-##  Usage
-
-### As a Library
-
-```js
-import { encrypt, decrypt } from "fortencrypt";
-
-const message = "sensitive data";
-
-// Encrypt
-const encrypted = encrypt(message);
-console.log(encrypted);
-/*
-{
-  iv: "a1b2c3...",
-  tag: "d4e5f6...",
-  ciphertext: "deadbeef..."
-}
-*/
-
-// Decrypt
-const decrypted = decrypt(encrypted);
-console.log(decrypted.toString()); // "sensitive data"
-```
-
-Works with Buffers too:
-
-```js
-const buf = Buffer.from("buffer test");
-const encrypted = encrypt(buf);
-const decrypted = decrypt(encrypted);
-
-console.log(decrypted.equals(buf)); // true
-```
-
----
-
-### Via CLI
-
-`fortencrypt` also provides a simple command-line interface.
-After installation, run:
+### Encrypt a Directory Recursively
 
 ```bash
-npx fortencrypt encrypt "hello world"
+fortencrypt encrypt -i documents/ -o encrypted_documents/ -k master.key -r
 ```
 
-Example output:
-
-```json
-{
-  "iv": "f9a8c4f5e8c3d9...",
-  "tag": "17a36bc9f95a2b...",
-  "ciphertext": "d8e9c4f1a3..."
-}
-```
-
-Decrypt with:
+### Decrypt with AAD
 
 ```bash
-npx fortencrypt decrypt '{"iv":"...","tag":"...","ciphertext":"..."}'
+fortencrypt decrypt -i data.enc -o data.txt -k master.key --aad "auth-data"
 ```
 
----
+### Use Environment Key
 
-##  Environment Variables
-
-* **`MASTER_KEY`**  Required.
-  Must be a 32-byte key in hex format (64 hex characters).
-
-Example:
-
-```
-MASTER_KEY=00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff
+```bash
+export MASTER_KEY=$(cat master.key)
+fortencrypt encrypt -i file.txt -o file.enc
 ```
 
----
+## API Reference
 
-##  Limitations
+### CryptoLib Class
 
-* Focused only on AES-256-GCM encryption/decryption.
-* Not a full crypto toolkit (hashing, signatures planned for future).
-* Requires secure key management outside of this library.
-* Same `MASTER_KEY` must be used for both encryption and decryption.
+#### Constructor
 
----
+`new CryptoLib(config?: Partial<CryptoConfig>): CryptoLib`
 
-##  Testing
+Creates a new CryptoLib instance with optional configuration.
+
+#### Methods
+
+- `initialize(masterKey?: string | Buffer | null, encoding?: BufferEncoding): void`
+- `setMasterKey(masterKey: string | Buffer, encoding?: BufferEncoding): void`
+- `encrypt(input: any, options?: Partial<CryptoConfig>): Promise<EncryptionResult | string>`
+- `decrypt(payload: EncryptionResult | string, options?: Partial<CryptoConfig>): Promise<any>`
+
+#### Static Methods
+
+- `generateKey(length?: number): Buffer`
+- `deriveKey(password: string, salt: Buffer, iterations?: number, length?: number): Buffer`
+
+### Helper Functions
+
+- `createCryptoLib(config?: Partial<CryptoConfig>): CryptoLib`
+- `generateAndSaveKey(filePath: string, length?: number): Promise<Buffer>`
+- `loadConfig(filePath: string): Promise<Record<string, any>>`
+
+## Testing
+
+Run the test suite:
 
 ```bash
 npm test
 ```
 
-Example output:
+## Security Considerations
 
-```
- PASS  test/crypto.test.js
-  AES-256-GCM Object Payload
-     encrypt & decrypt string correctly
-     encrypt & decrypt buffer correctly
-     rejects invalid input type
-     throws error on corrupted payload
-```
+- Always use strong, randomly generated keys
+- Protect encryption keys with appropriate access controls
+- Regularly rotate encryption keys for sensitive data
+- Use Additional Authenticated Data (AAD) when appropriate
+- Validate decrypted data before use
 
----
+## License
 
-##  License
-
-[MIT](LICENSE)  [custodiaorg](https://github.com/Custodiaorg)
+[MIT](./LICENSE)
