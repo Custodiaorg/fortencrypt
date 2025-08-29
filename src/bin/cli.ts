@@ -21,7 +21,7 @@ import CryptoLib, {
   createCryptoLib,
   generateAndSaveKey,
   loadConfig,
-} from "../core/crypto";
+} from "../core/crypto.js";
 
 // Inisialisasi program
 const program = new Command();
