@@ -9,6 +9,9 @@ on:
 jobs:
   deep-test:
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: read
 
     steps:
       - name: Checkout repository
@@ -24,14 +27,16 @@ jobs:
         run: npm ci
 
       - name: Build project
-        run: npm run build
+        run: |
+          npm run build
+          ls -R dist
 
       - name: Run Deep Test Harness
         run: |
-          chmod +x ./script/cli-test.sh
-          ./script/cli-test.sh
+          chmod +x ./deep-test.sh
+          ./deep-test.sh
         env:
-          # Bisa override config di script:
+          FORTENCRYPT: "node dist/src/bin/cli.js"
           DEBUG: "0"
           TRACE: "0"
           SLOW: "0"
