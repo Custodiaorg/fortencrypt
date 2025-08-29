@@ -1,19 +1,18 @@
 .
-├── bin
-│   └── cli.ts
 ├── docs
-├── jest.config.js
+├── jest.config.cjs
 ├── LICENSE
 ├── package.json
 ├── package-lock.json
 ├── README.md
 ├── src
+│   ├── bin
+│   │   └── cli.ts
 │   └── core
 │       ├── crypto.ts
-│       ├── index.ts
-│       └── signature.ts
+│       └── index.ts
 ├── test
-│   └── crypto.test.js
+│   └── crypto.test.ts
 └── tsconfig.json
 
-6 directories, 11 files
+6 directories, 10 files
