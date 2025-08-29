@@ -1,5 +1,4 @@
-import { encrypt } from "../src/core/encrypt.mjs";
-import { decrypt } from "../src/core/descryprt.mjs";
+import { encrypt, decrypt } from "./../src/core/crypto.mjs";
 
 const data = "Hello World";
 
